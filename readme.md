@@ -177,6 +177,26 @@ Evaluation was performed on the held-out **2026 test dataset**.
 - The best model achieved a PR-AUC approximately 2.23 times the positive-class prevalence of 0.096.
 - The results demonstrate promising predictive signal, although further spatial and ground-truth validation is required.
 
+## Vegetation Risk Map
+
+The following map visualizes the predicted vegetation-loss risk across the Amrabad Forest Region, Telangana.
+
+![Amrabad Forest Risk Map](outputs/risk_map.png)
+
+It highlights forest pixels classified into four risk categories based on their predicted vegetation stress scores for the two-month forecasting horizon.
+
+![Amrabad Forest Vegetation Loss Risk Map](assets/amrabad_risk_map.png)
+
+**Risk Categories:**
+- 🟢 **Low Risk:** Low predicted vegetation stress.
+- 🟡 **Moderate Risk:** Moderate potential for vegetation stress.
+- 🟠 **High Risk:** Elevated potential for vegetation stress.
+- 🔴 **Very High Risk:** Highest predicted vegetation stress.
+
+The map helps identify potentially vulnerable forest regions and supports prioritization of field monitoring and conservation efforts.
+
+
+
 ## Explainable AI (SHAP)
 
 SHAP (SHapley Additive Explanations) is used to understand how individual environmental features influence the model's predictions.
