@@ -1,0 +1,5 @@
+Model,PR-AUC,ROC-AUC,F1,Recall
+Persistence baseline,0.127,0.536,0.171,0.165
+Logistic Regression,0.117,0.594,0.141,0.174
+"XGBoost (external features only, no NDVI)",0.214,0.774,0.334,0.794
+XGBoost (all features),0.205,0.731,0.255,0.278

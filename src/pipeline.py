@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 from xgboost import XGBClassifier
 
-CSV = "amrabad_2023_2026raw.csv"   # change to your file name
+CSV = "data/amrabad_2023_2026raw.csv"   # change to your file name
 HORIZON = 2                         # label = anomaly this many months ahead
 THRESH = -1.0                       # anomaly threshold (SD); test -0.5 and -1.5 too
 
@@ -103,14 +103,57 @@ xgb2.fit(train[other_feats], train.label)
 print("TEST 2026, no NDVI features")
 report("  XGBoost", test.label, xgb2.predict_proba(test[other_feats])[:, 1])
 
+# ---------- 5b. Results table for the README ----------
+import os
+from sklearn.metrics import precision_recall_curve
+
+def pick_threshold(y, p):
+    """Cutoff that maximises F1 on VALIDATION data."""
+    prec, rec, thr = precision_recall_curve(y, p)
+    f1 = 2 * prec * rec / (prec + rec + 1e-9)
+    return thr[np.argmax(f1[:-1])]
+
+def score_row(name, p_val, p_test):
+    t = pick_threshold(val.label, p_val)          # threshold chosen on val only
+    pred = (p_test >= t).astype(int)
+    return {"Model": name,
+            "PR-AUC": average_precision_score(test.label, p_test),
+            "ROC-AUC": roc_auc_score(test.label, p_test),
+            "F1": f1_score(test.label, pred),
+            "Recall": recall_score(test.label, pred)}
+
+rows = [
+    score_row("Persistence baseline", -val.ndvi_anom, -test.ndvi_anom),
+    score_row("Logistic Regression",
+              lr.predict_proba(val[features])[:, 1], lr.predict_proba(test[features])[:, 1]),
+    score_row("XGBoost (external features only, no NDVI)",
+              xgb2.predict_proba(val[other_feats])[:, 1], xgb2.predict_proba(test[other_feats])[:, 1]),
+    score_row("XGBoost (all features)",
+              xgb.predict_proba(val[features])[:, 1], xgb.predict_proba(test[features])[:, 1]),
+]
+results = pd.DataFrame(rows).round(3)
+os.makedirs("outputs", exist_ok=True)
+results.to_csv("outputs/metrics.csv", index=False)
+
+print("Test prevalence:", round(test.label.mean(), 3))
+print("| " + " | ".join(results.columns) + " |")
+print("|" + "---|" * len(results.columns))
+for _, r in results.iterrows():
+    print("| " + " | ".join(str(v) for v in r) + " |")
+
+# Do the risk classes mean anything? Loss rate should rise Low -> Very High
+cat = pd.cut(xgb.predict_proba(test[features])[:, 1], [0, .10, .20, .30, 1.0],
+             labels=["Low", "Moderate", "High", "Very High"], include_lowest=True)
+print(test.groupby(cat, observed=True).label.agg(["mean", "count"]))
+
 # ---------- 6. SHAP ----------
 import shap, matplotlib.pyplot as plt
 sample = test[features].sample(min(5000, len(test)), random_state=1)
 sv = shap.TreeExplainer(xgb).shap_values(sample)
-shap.summary_plot(sv, sample, show=False); plt.tight_layout(); plt.savefig("shap_all.png", dpi=150); plt.close()
+shap.summary_plot(sv, sample, show=False); plt.tight_layout(); plt.savefig("outputs/shap_all.png", dpi=150); plt.close()
 sample2 = test[other_feats].sample(min(5000, len(test)), random_state=1)
 sv2 = shap.TreeExplainer(xgb2).shap_values(sample2)
-shap.summary_plot(sv2, sample2, show=False); plt.tight_layout(); plt.savefig("shap_external_only.png", dpi=150); plt.close()
+shap.summary_plot(sv2, sample2, show=False); plt.tight_layout(); plt.savefig("outputs/shap_external_only.png", dpi=150); plt.close()
 
 # ---------- 7. Risk table for the map ----------
 out = predict[["pixel_id", "date", "longitude", "latitude"]].copy()
@@ -121,7 +164,7 @@ out["risk_class"] = pd.cut(
     labels=["Low", "Moderate", "High", "Very High"],
     include_lowest=True
 )
-out.to_csv("risk_predictions.csv", index=False)
+out.to_csv("outputs/risk_predictions.csv", index=False)
 print(out.groupby("date").risk_class.value_counts().unstack())
 print("saved: risk_predictions.csv, shap_all.png, shap_external_only.png")
 
