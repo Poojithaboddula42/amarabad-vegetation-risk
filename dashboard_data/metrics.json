@@ -1,0 +1,79 @@
+{
+  "features": [
+    "ndvi",
+    "ndvi_anom",
+    "anom_lag1",
+    "anom_lag2",
+    "anom_lag3",
+    "ndwi",
+    "rain",
+    "lst",
+    "elevation",
+    "slope",
+    "aspect",
+    "rain_lag1",
+    "rain_lag2",
+    "rain_lag3",
+    "lst_lag1",
+    "lst_lag2",
+    "lst_lag3",
+    "rain_3m",
+    "lst_3m",
+    "m_sin",
+    "m_cos"
+  ],
+  "ndvi_feats": [
+    "ndvi",
+    "ndvi_anom",
+    "anom_lag1",
+    "anom_lag2",
+    "anom_lag3"
+  ],
+  "other_feats": [
+    "ndwi",
+    "rain",
+    "lst",
+    "elevation",
+    "slope",
+    "aspect",
+    "rain_lag1",
+    "rain_lag2",
+    "rain_lag3",
+    "lst_lag1",
+    "lst_lag2",
+    "lst_lag3",
+    "rain_3m",
+    "lst_3m",
+    "m_sin",
+    "m_cos"
+  ],
+  "horizon_months": 2,
+  "threshold_sd": -1.0,
+  "thresholds": {
+    "moderate": 0.1,
+    "high": 0.2,
+    "very_high": 0.3
+  },
+  "n_pixels": 602,
+  "last_date": "2026-08-01",
+  "val": {
+    "rows": 7224,
+    "base_rate": 0.07862679955703211,
+    "pr_auc": 0.11369874757062567,
+    "roc_auc": 0.5682321467869718,
+    "top10_hit_rate": 0.1479944674965422,
+    "lift_top10": 1.8822394950616563
+  },
+  "test": {
+    "rows": 3612,
+    "base_rate": 0.09551495016611296,
+    "pr_auc": 0.201567948151063,
+    "roc_auc": 0.7242135895627331,
+    "top10_hit_rate": 0.23480662983425415,
+    "lift_top10": 2.4583233245255824
+  },
+  "test_no_ndvi": {
+    "pr_auc": 0.2215719399415446,
+    "roc_auc": 0.7745873313725753
+  }
+}
