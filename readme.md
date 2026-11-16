@@ -185,8 +185,6 @@ The following map visualizes the predicted vegetation-loss risk across the Amrab
 
 It highlights forest pixels classified into four risk categories based on their predicted vegetation stress scores for the two-month forecasting horizon.
 
-![Amrabad Forest Vegetation Loss Risk Map](assets/amrabad_risk_map.png)
-
 **Risk Categories:**
 - 🟢 **Low Risk:** Low predicted vegetation stress.
 - 🟡 **Moderate Risk:** Moderate potential for vegetation stress.
