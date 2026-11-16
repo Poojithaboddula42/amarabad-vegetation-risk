@@ -100,14 +100,29 @@ def drivers_sentence(c):
 
 
 def make_map(d, risk_col="risk", cls_col="cls"):
-    m = folium.Map(location=[d.latitude.mean(), d.longitude.mean()], zoom_start=9, tiles="CartoDB positron")
+    m = folium.Map(
+        location=[d.latitude.mean(), d.longitude.mean()],
+        zoom_start=9,
+        tiles="OpenStreetMap",
+        control_scale=True
+    )
+
     for r in d.itertuples():
         folium.CircleMarker(
-            [r.latitude, r.longitude], radius=4, color=COLORS[getattr(r, cls_col)],
-            fill=True, fill_opacity=0.85, weight=0,
-            tooltip=f"{r.pixel_id} | risk index {getattr(r, risk_col):.2f} ({getattr(r, cls_col)})").add_to(m)
-    return m
+            [r.latitude, r.longitude],
+            radius=4,
+            color=COLORS[getattr(r, cls_col)],
+            fill=True,
+            fill_opacity=0.85,
+            weight=0,
+            tooltip=(
+                f"{r.pixel_id} | "
+                f"Risk: {getattr(r, risk_col):.2f} | "
+                f"Class: {getattr(r, cls_col)}"
+            )
+        ).add_to(m)
 
+    return m
 
 def legend():
     st.markdown(" ".join(f"<span style='color:{COLORS[c]}'>&#9679;</span> {c}" for c in CLASSES),
